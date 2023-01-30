@@ -46,7 +46,7 @@ class _FlutterDemoState extends State<FlutterDemo> {
   /// The base item extent at 0 index.
   ///
   /// Each item will have an extent = this + index.
-  static const int baseItemExtent = 40;
+  static const baseItemExtent = 40.0;
 
   double flutterVelocity = 0;
   double platformVelocity = 0;
@@ -125,7 +125,7 @@ class _FlutterDemoState extends State<FlutterDemo> {
             physics: getScrollPhysics(context),
             itemBuilder: (BuildContext context, int index) {
               return Container(
-                height: (baseItemExtent + index).toDouble(),
+                height: baseItemExtent,
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: const Color(0xFF666666),

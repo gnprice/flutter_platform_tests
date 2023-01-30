@@ -211,8 +211,7 @@ public class ScrollOverlayActivity extends Activity {
             // compute the exact total offsets in dp and apply the lossy unit conversion
             // directly to those.
             private int offsetToTop(int position) {
-                // This is the sum baseItemExtent + (baseItemExtent + 1) + (baseItemExtent + 2) + ….
-                int topInDp = position * baseItemExtent + position * (position - 1) / 2;
+                int topInDp = position * baseItemExtent;
                 return (int) TypedValue
                         .applyDimension(TypedValue.COMPLEX_UNIT_DIP, topInDp, getResources().getDisplayMetrics());
             }
