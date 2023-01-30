@@ -122,7 +122,6 @@ class _FlutterDemoState extends State<FlutterDemo> {
         children: <Widget>[
           ListView.builder(
             controller: controller,
-            itemCount: 1000,
             physics: getScrollPhysics(context),
             itemBuilder: (BuildContext context, int index) {
               return Container(
