@@ -24,7 +24,7 @@ class FlingScrollSimulation extends Simulation {
   FlingScrollSimulation(
       {super.tolerance, required this.position, required this.velocity}) {
     _duration = _flingDuration(velocity);
-    _distance = (velocity * _duration / _initialVelocityPenetration).abs();
+    _distance = (velocity * _duration * 0.35).abs();
   }
 
   final double position;
