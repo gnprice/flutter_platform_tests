@@ -5,12 +5,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'scroll_physics.dart';
+
 const EventChannel _platformVelocityEventChannel = EventChannel('scroll_overlay.flutter.io/velocity');
 
 void main() {
   runApp(DemoApp(
     // EDIT HERE if you want to experiment with a custom [ScrollPhysics].
-    physics: null,
+    physics: CustomScrollPhysics(),
   ));
 }
 
