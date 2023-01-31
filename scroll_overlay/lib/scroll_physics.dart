@@ -2,12 +2,12 @@ import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
 
-class CustomScrollPhysics extends ClampingScrollPhysics {
-  const CustomScrollPhysics({super.parent});
+class CubicCubicScrollPhysics extends ClampingScrollPhysics {
+  const CubicCubicScrollPhysics({super.parent});
 
   @override
   ClampingScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return CustomScrollPhysics(parent: buildParent(ancestor));
+    return CubicCubicScrollPhysics(parent: buildParent(ancestor));
   }
 
   @override
@@ -15,7 +15,7 @@ class CustomScrollPhysics extends ClampingScrollPhysics {
     final base = super.createBallisticSimulation(position, velocity);
     if (base is! ClampingScrollSimulation)
       return base;
-    return FlingScrollSimulation(
+    return CubicCubicScrollSimulation(
       // TODO: We should clamp the velocity differently.  Currently we clamp
       //   the full 2D velocity to 8000px/s, and then take the component in the
       //   scrollable axis.  This has the effect that if the user moves their
@@ -34,8 +34,8 @@ class CustomScrollPhysics extends ClampingScrollPhysics {
   }
 }
 
-class FlingScrollSimulation extends Simulation {
-  FlingScrollSimulation(
+class CubicCubicScrollSimulation extends Simulation {
+  CubicCubicScrollSimulation(
       {super.tolerance, required this.position, required this.velocity}) {
     _duration = _flingDuration(velocity);
     _distance = _flingAverageSpeed(velocity) * _duration;
