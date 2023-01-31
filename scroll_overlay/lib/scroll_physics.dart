@@ -16,7 +16,21 @@ class CustomScrollPhysics extends ClampingScrollPhysics {
     if (base is! ClampingScrollSimulation)
       return base;
     return FlingScrollSimulation(
-        position: position.pixels, velocity: velocity, tolerance: tolerance);
+      // TODO: We should clamp the velocity differently.  Currently we clamp
+      //   the full 2D velocity to 8000px/s, and then take the component in the
+      //   scrollable axis.  This has the effect that if the user moves their
+      //   finger diagonally at high speed, we'll end up clamping not just down
+      //   to maxFlingVelocity but to a much lower speed.  For example a swipe
+      //   at (6240, 8320) px/s interpreted as a vertical scroll will produce a
+      //   velocity of not 8000 px/s but 6400 px/s.
+      //
+      // The relevant code is in [DragGestureRecognizer._checkEnd], calling
+      // [Velocity.clampMagnitude].
+      //
+      // For a quick crude demo here, we just assume every fling is a max-speed
+      // fling.  The result: any fast fling lands at pixel-perfect agreement
+      // between the Flutter and Android sides!
+        position: position.pixels, velocity: 8000.0 * velocity.sign, tolerance: tolerance);
   }
 }
 
@@ -35,21 +49,6 @@ class FlingScrollSimulation extends Simulation {
 
   static const friction = 0.015;
 
-  /// A rough estimate of the ratio of the user's 2D fling velocity to their
-  /// velocity in the scroll direction.
-  ///
-  /// In the Android scroll physics, the velocity that controls the fling's
-  /// duration is the total 2D velocity Math.hypot(velocityX, velocityY), even
-  /// when the scrolling is constrained to one axis.  This means that when a
-  /// fling in e.g. a vertical scroll is also given some horizontal velocity, it
-  /// decays more slowly and goes more total distance than would a fling with
-  /// the same velocityY but a zero velocityX.
-  ///
-  /// We don't see the cross-axis velocity, so we have to guess.  It's probably
-  /// better to guess a bit high than a bit low, in order to be perceived as
-  /// fast and light rather than sluggish.
-  static const _kVelocity2dFudge = 1.414;
-
   // See DECELERATION_RATE.
   static final double _kDecelerationRate = math.log(0.78) / math.log(0.9);
 
@@ -63,10 +62,8 @@ class FlingScrollSimulation extends Simulation {
     // See mPhysicalCoeff
     final double scaledFriction = friction * _decelerationForFriction(0.84);
 
-    final totalVelocity = velocity.abs() * _kVelocity2dFudge;
-
     // See getSplineDeceleration().
-    final double deceleration = math.log(kInflexion * totalVelocity / scaledFriction);
+    final double deceleration = math.log(kInflexion * velocity.abs() / scaledFriction);
 
     return math.exp(deceleration / (_kDecelerationRate - 1.0));
   }
