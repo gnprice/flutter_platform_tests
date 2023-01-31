@@ -24,7 +24,7 @@ class FlingScrollSimulation extends Simulation {
   FlingScrollSimulation(
       {super.tolerance, required this.position, required this.velocity}) {
     _duration = _flingDuration(velocity);
-    _distance = (velocity * _duration * 0.35).abs();
+    _distance = _flingAverageSpeed(velocity) * _duration;
   }
 
   final double position;
@@ -49,34 +49,65 @@ class FlingScrollSimulation extends Simulation {
     final double scaledFriction = friction * _decelerationForFriction(0.84);
 
     // See getSplineDeceleration().
-    final double deceleration = math.log(0.35 * velocity.abs() / scaledFriction);
+    final double deceleration = math.log(kInflexion * velocity.abs() / scaledFriction);
 
     return math.exp(deceleration / (_kDecelerationRate - 1.0));
   }
 
-  // Based on a cubic curve fit to the Scroller.computeScrollOffset() values
-  // produced for an initial velocity of 4000. The value of Scroller.getDuration()
-  // and Scroller.getFinalY() were 686ms and 961 pixels respectively.
-  //
-  // Algebra courtesy of Wolfram Alpha.
-  //
-  // f(x) = scrollOffset, x is time in milliseconds
-  // f(x) = 3.60882×10^-6 x^3 - 0.00668009 x^2 + 4.29427 x - 3.15307
-  // f(x) = 3.60882×10^-6 x^3 - 0.00668009 x^2 + 4.29427 x, so f(0) is 0
-  // f(686ms) = 961 pixels
-  // Scale to f(0 <= t <= 1.0), x = t * 686
-  // f(t) = 1165.03 t^3 - 3143.62 t^2 + 2945.87 t
-  // Scale f(t) so that 0.0 <= f(t) <= 1.0
-  // f(t) = (1165.03 t^3 - 3143.62 t^2 + 2945.87 t) / 961.0
-  //      = 1.2 t^3 - 3.27 t^2 + 3.065 t
-  static const double _initialVelocityPenetration = 3.065;
-  static double _flingDistancePenetration(double t) {
-    return (1.2 * t * t * t) - (3.27 * t * t) + (_initialVelocityPenetration * t);
+  // The average speed over the whole fling.  This is the ratio of
+  // getSplineFlingDistance to getSplineFlingDuration, in per-second units.
+  double _flingAverageSpeed(double velocity) {
+    return kInflexion * velocity.abs();
   }
 
-  // The derivative of the _flingDistancePenetration() function.
+  // See INFLEXION.
+  static const kInflexion = 0.35;
+
+  static const kBend = 1 - (3 * kInflexion / 2);
+
+  // The Android scroll physics has the equation:
+  //   t = kBend * z**3 + (1-kBend) * z    (equation 1a)
+  //   x =  -1/2 * z**3 +    3/2    * z    (equation 1b)
+  // where t is time as a fraction of [_duration] (so 0 <= t <= 1);
+  // z is an abstract intermediate variable, with 0 <= z <= 1;
+  // and x is the position of the scroll fling, scaled to run from 0 to 1.
+  // See the initialization of SPLINE_POSITION (where t, z, x are called
+  // alpha, x, and SPLINE_POSITION[i] respectively.)
+  //
+  // In order to solve for x given t, the Android framework precomputes a table
+  // of x at values of t spaced by (1 / NB_SAMPLES) == 1/100 (that table is
+  // SPLINE_POSITION), and then does linear interpolation on the values in the
+  // table.
+  //
+  // We instead use an approximation of equation 1a, of the form:
+  //   z = a3 * t**3 + a2 * t**2 + a1 * t + a0    (equation 2a)
+  // where the coefficients a0, a1, a2, a3 are chosen so that the curve
+  // both passes through the desired start and end points (0,0) and (1,1),
+  // and has the same slope at those points as equation 1a does.
+  // Then we can use the value of z to apply equation 1b directly.
+  static const kCoeff3 = (4*kBend*kBend - kBend) / ((1-kBend) * (1 + 2*kBend));
+  static const kCoeff2 = -6*kBend*kBend / ((1-kBend) * (1 + 2*kBend));
+  static const kCoeff1 = 1 / (1-kBend);
+
+  // Compute z given t, using equation 2a to approximate equation 1a.
+  static double _flingProgress(double t) {
+    return kCoeff3 * t*t*t + kCoeff2 * t*t + kCoeff1 * t;
+  }
+
+  // Compute x given t, using the approximation.
+  static double _flingDistancePenetration(double t) {
+    final z = _flingProgress(t);
+    assert(0 <= z && z <= 1);
+    return (- z*z*z + 3*z) / 2;
+  }
+
+  // Compute dx/dt given t, using the approximation.
   static double _flingVelocityPenetration(double t) {
-    return (3.6 * t * t) - (6.54 * t) + _initialVelocityPenetration;
+    final z = _flingProgress(t);
+    assert(0 <= z && z <= 1);
+    final dxByDz = (- z*z + 1) * 3/2;
+    final dzByDt = 3*kCoeff3 * t*t + 2*kCoeff2 * t + kCoeff1;
+    return dxByDz * dzByDt;
   }
 
   @override
