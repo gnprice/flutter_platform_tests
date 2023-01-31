@@ -35,6 +35,21 @@ class FlingScrollSimulation extends Simulation {
 
   static const friction = 0.015;
 
+  /// A rough estimate of the ratio of the user's 2D fling velocity to their
+  /// velocity in the scroll direction.
+  ///
+  /// In the Android scroll physics, the velocity that controls the fling's
+  /// duration is the total 2D velocity Math.hypot(velocityX, velocityY), even
+  /// when the scrolling is constrained to one axis.  This means that when a
+  /// fling in e.g. a vertical scroll is also given some horizontal velocity, it
+  /// decays more slowly and goes more total distance than would a fling with
+  /// the same velocityY but a zero velocityX.
+  ///
+  /// We don't see the cross-axis velocity, so we have to guess.  It's probably
+  /// better to guess a bit high than a bit low, in order to be perceived as
+  /// fast and light rather than sluggish.
+  static const _kVelocity2dFudge = 1.414;
+
   // See DECELERATION_RATE.
   static final double _kDecelerationRate = math.log(0.78) / math.log(0.9);
 
@@ -48,8 +63,10 @@ class FlingScrollSimulation extends Simulation {
     // See mPhysicalCoeff
     final double scaledFriction = friction * _decelerationForFriction(0.84);
 
+    final totalVelocity = velocity.abs() * _kVelocity2dFudge;
+
     // See getSplineDeceleration().
-    final double deceleration = math.log(kInflexion * velocity.abs() / scaledFriction);
+    final double deceleration = math.log(kInflexion * totalVelocity / scaledFriction);
 
     return math.exp(deceleration / (_kDecelerationRate - 1.0));
   }
