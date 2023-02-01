@@ -12,7 +12,7 @@ const EventChannel _platformVelocityEventChannel = EventChannel('scroll_overlay.
 void main() {
   runApp(DemoApp(
     // EDIT HERE if you want to experiment with a custom [ScrollPhysics].
-    physics: CubicCubicScrollPhysics(),
+    physics: DecicScrollPhysics(),
   ));
 }
 
