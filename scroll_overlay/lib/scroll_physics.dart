@@ -68,12 +68,12 @@ class DecicScrollSimulation extends Simulation {
 
   // Compute x given t, using the approximation.
   static double _flingDistancePenetration(double t) {
-    return -41.911 * t*t*t*t*t*t*t*t*t*t + 236.515 * t*t*t*t*t*t*t*t*t + -553.947 * t*t*t*t*t*t*t*t + 686.393 * t*t*t*t*t*t*t + -466.693 * t*t*t*t*t*t + 150.619 * t*t*t*t*t + -12.834 * t*t*t + 2.857 * t;
+    return -41.91062021450815 * t*t*t*t*t*t*t*t*t*t + 236.5149267239282 * t*t*t*t*t*t*t*t*t + -553.9466639943882 * t*t*t*t*t*t*t*t + 686.3932037159542 * t*t*t*t*t*t*t + -466.6927670568513 * t*t*t*t*t*t + 150.6189365754758 * t*t*t*t*t + -12.83415860675335 * t*t*t + 2.857142857142857 * t;
   }
 
   // Compute dx/dt given t, using the approximation.
   static double _flingVelocityPenetration(double t) {
-    return -419.106 * t*t*t*t*t*t*t*t*t + 2128.634 * t*t*t*t*t*t*t*t + -4431.573 * t*t*t*t*t*t*t + 4804.752 * t*t*t*t*t*t + -2800.157 * t*t*t*t*t + 753.095 * t*t*t*t + -38.502 * t*t + 2.857;
+    return -419.1062021450815 * t*t*t*t*t*t*t*t*t + 2128.634340515354 * t*t*t*t*t*t*t*t + -4431.573311955106 * t*t*t*t*t*t*t + 4804.75242601168 * t*t*t*t*t*t + -2800.156602341108 * t*t*t*t*t + 753.094682877379 * t*t*t*t + -38.50247582026005 * t*t + 2.857142857142857;
   }
 
   @override
