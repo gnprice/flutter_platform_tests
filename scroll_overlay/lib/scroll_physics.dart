@@ -16,8 +16,7 @@ class DecicScrollPhysics extends ClampingScrollPhysics {
     if (base is! ClampingScrollSimulation)
       return base;
     return DecicScrollSimulation(
-      // TODO: hack on velocity clamp
-        position: position.pixels, velocity: 8000.0 * velocity.sign, tolerance: tolerance);
+        position: position.pixels, velocity: velocity, tolerance: tolerance);
   }
 }
 
@@ -109,21 +108,7 @@ class CubicCubicScrollPhysics extends ClampingScrollPhysics {
     if (base is! ClampingScrollSimulation)
       return base;
     return CubicCubicScrollSimulation(
-      // TODO: We should clamp the velocity differently.  Currently we clamp
-      //   the full 2D velocity to 8000px/s, and then take the component in the
-      //   scrollable axis.  This has the effect that if the user moves their
-      //   finger diagonally at high speed, we'll end up clamping not just down
-      //   to maxFlingVelocity but to a much lower speed.  For example a swipe
-      //   at (6240, 8320) px/s interpreted as a vertical scroll will produce a
-      //   velocity of not 8000 px/s but 6400 px/s.
-      //
-      // The relevant code is in [DragGestureRecognizer._checkEnd], calling
-      // [Velocity.clampMagnitude].
-      //
-      // For a quick crude demo here, we just assume every fling is a max-speed
-      // fling.  The result: any fast fling lands at pixel-perfect agreement
-      // between the Flutter and Android sides!
-        position: position.pixels, velocity: 8000.0 * velocity.sign, tolerance: tolerance);
+        position: position.pixels, velocity: velocity, tolerance: tolerance);
   }
 }
 
