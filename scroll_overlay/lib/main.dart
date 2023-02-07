@@ -195,6 +195,15 @@ class DebugScrollPhysics extends ScrollPhysics {
     }
     return super.createBallisticSimulation(position, velocity);
   }
+
+  @override
+  bool get canRecreateBallisticSimulation => false;
+
+  @override
+  Simulation? updateBallisticSimulation(Simulation oldSimulation, ScrollMetrics position, double time) {
+    debugPrint("updateBallisticSimulation: time ${time.toStringAsFixed(4)}");
+    return super.updateBallisticSimulation(oldSimulation, position, time);
+  }
 }
 
 class VelocityOverlay extends StatelessWidget {
