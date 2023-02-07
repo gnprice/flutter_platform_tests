@@ -20,18 +20,37 @@ class DecicScrollPhysics extends ClampingScrollPhysics {
   }
 
   @override
-  bool get canRecreateBallisticSimulation => true;
+  Simulation? updateBallisticSimulation(Simulation oldSimulation, ScrollMetrics position, double time) {
+    final base = super.updateBallisticSimulation(oldSimulation, position, time);
+    if (base is! ClampingScrollSimulation)
+      return base;
+    if (oldSimulation is! DecicScrollSimulation) {
+      return DecicScrollSimulation(
+        position: position.pixels,
+        velocity: oldSimulation.dx(time),
+        tolerance: tolerance,
+      );
+    }
+    return DecicScrollSimulation(
+      position: oldSimulation.position,
+      velocity: oldSimulation.velocity,
+      tolerance: oldSimulation.tolerance,
+      offsetTime: time + oldSimulation.offsetTime,
+    );
+  }
 }
 
 class DecicScrollSimulation extends Simulation {
   DecicScrollSimulation(
-      {super.tolerance, required this.position, required this.velocity}) {
+      {super.tolerance, required this.position, required this.velocity,
+      this.offsetTime = 0.0}) {
     _duration = _flingDuration(velocity);
     _distance = _flingAverageSpeed(velocity) * _duration;
   }
 
   final double position;
   final double velocity;
+  final double offsetTime;
 
   late double _duration;
   late double _distance;
@@ -80,19 +99,19 @@ class DecicScrollSimulation extends Simulation {
 
   @override
   double x(double time) {
-    final double t = clampDouble(time / _duration, 0.0, 1.0);
+    final double t = clampDouble((time + offsetTime) / _duration, 0.0, 1.0);
     return position + _distance * _flingDistancePenetration(t) * velocity.sign;
   }
 
   @override
   double dx(double time) {
-    final double t = clampDouble(time / _duration, 0.0, 1.0);
+    final double t = clampDouble((time + offsetTime) / _duration, 0.0, 1.0);
     return _distance * _flingVelocityPenetration(t) * velocity.sign / _duration;
   }
 
   @override
   bool isDone(double time) {
-    return time >= _duration;
+    return (time + offsetTime) >= _duration;
   }
 }
 
