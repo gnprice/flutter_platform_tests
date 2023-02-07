@@ -219,12 +219,12 @@ public class ScrollOverlayActivity extends Activity {
 
             void bind(int position) {
                 int color = OVERLAY_COLORS[position % OVERLAY_COLORS.length];
-                itemView.setBackground(new ColorDrawable(color));
+//                itemView.setBackground(new ColorDrawable(color));
                 final int height = offsetToTop(position + 1) - offsetToTop(position);
                 itemView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
                 TextView textView = itemView.findViewById(R.id.text_view);
                 textView.setText("Android " + position);
-                textView.setTextColor(0xFF000000);
+                textView.setTextColor(0x00000000);
                 textView.setGravity(Gravity.CENTER_VERTICAL);
                 textView.setTextSize(16);
                 textView.setPadding((int) TypedValue.applyDimension(
