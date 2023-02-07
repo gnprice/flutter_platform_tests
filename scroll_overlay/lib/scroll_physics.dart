@@ -59,14 +59,13 @@ class PowerLawScrollSimulation extends Simulation {
 
   // See getSplineFlingDuration(). Returns a value in seconds.
   double _flingDuration(double velocity) {
-    // See mPhysicalCoeff
+    // See mPhysicalCoeff.
     final double scaledFriction = friction * _decelerationForFriction(0.84);
 
-    // See getSplineDeceleration().
-    final double deceleration = math.log(kInflexion * velocity.abs() / scaledFriction);
-
     // This is scaled so that the total distance traveled is the same as on Android.
-    return _kDecelerationRate * kInflexion * math.exp(deceleration / (_kDecelerationRate - 1.0));
+    return _kDecelerationRate * kInflexion *
+        math.pow(velocity.abs() * kInflexion / scaledFriction,
+                 1 / (_kDecelerationRate - 1.0));
   }
 
   // See INFLEXION.
