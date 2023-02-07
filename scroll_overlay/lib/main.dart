@@ -83,6 +83,7 @@ class _FlutterDemoState extends State<FlutterDemo> {
             return;
           final double delta = controller.offset - oldOffset!;
           final double velocity = delta / timeDelta * 1e6;
+          debugPrint('velocity ${velocity.toStringAsFixed(1)}');
           if (velocity != flutterVelocity) {
             _setStateNextFrame(() {
               flutterVelocity = velocity;
@@ -201,7 +202,7 @@ class DebugScrollPhysics extends ScrollPhysics {
 
   @override
   Simulation? updateBallisticSimulation(Simulation oldSimulation, ScrollMetrics position, double time) {
-    debugPrint("updateBallisticSimulation: time ${time.toStringAsFixed(4)}");
+    // debugPrint("updateBallisticSimulation: time ${time.toStringAsFixed(4)}");
     return super.updateBallisticSimulation(oldSimulation, position, time);
   }
 }

@@ -38,7 +38,7 @@ class PowerLawScrollSimulation extends Simulation {
       {super.tolerance, required this.position, required this.velocity,
         this.offsetTime = 0.0}) {
     _duration = _flingDuration(velocity);
-    // debugPrint('simulation: v0=${velocity.toStringAsFixed(1)}, times ${offsetTime.toStringAsFixed(4)}/${_duration.toStringAsFixed(4)}');
+    debugPrint('simulation: v0=${velocity.toStringAsFixed(1)}, times ${offsetTime.toStringAsFixed(4)}/${_duration.toStringAsFixed(4)}');
   }
 
   final double position;
