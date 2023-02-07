@@ -20,7 +20,9 @@ class PowerLawScrollPhysics extends ClampingScrollPhysics {
   }
 
   @override
-  bool get canRecreateBallisticSimulation => true;
+  Simulation? updateBallisticSimulation(Simulation oldSimulation, ScrollMetrics position, double time) {
+    return createBallisticSimulation(position, oldSimulation.dx(time));
+  }
 }
 
 /// An implementation of scroll physics that aligns with Android.
