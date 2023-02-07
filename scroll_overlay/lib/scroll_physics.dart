@@ -18,6 +18,9 @@ class DecicScrollPhysics extends ClampingScrollPhysics {
     return DecicScrollSimulation(
         position: position.pixels, velocity: velocity, tolerance: tolerance);
   }
+
+  @override
+  bool get canRecreateBallisticSimulation => true;
 }
 
 class DecicScrollSimulation extends Simulation {
