@@ -20,25 +20,7 @@ class PowerLawScrollPhysics extends ClampingScrollPhysics {
   }
 
   @override
-  Simulation? updateBallisticSimulation(Simulation oldSimulation, ScrollMetrics position, double time) {
-    final base = super.updateBallisticSimulation(oldSimulation, position, time);
-    if (base is! ClampingScrollSimulation)
-      return base;
-    if (oldSimulation is! PowerLawScrollSimulation) {
-      return PowerLawScrollSimulation(
-        position: position.pixels,
-        velocity: oldSimulation.dx(time),
-        tolerance: tolerance,
-      );
-    }
-    return PowerLawScrollSimulation(
-      position: oldSimulation.position,
-      velocity: oldSimulation.velocity,
-      tolerance: oldSimulation.tolerance,
-      offsetTime: time + oldSimulation.offsetTime,
-    );
-  }
-
+  bool get canRecreateBallisticSimulation => true;
 }
 
 /// An implementation of scroll physics that aligns with Android.
