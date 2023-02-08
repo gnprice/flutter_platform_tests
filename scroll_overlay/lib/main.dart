@@ -184,14 +184,15 @@ class DebugScrollPhysics extends ScrollPhysics {
   }
 
   @override
-  Simulation? createBallisticSimulation(ScrollMetrics position, double velocity) {
+  Simulation? createBallisticSimulation(ScrollMetrics position, Simulation oldSimulation, {double time = 0.0}) {
+    final double velocity = oldSimulation.dx(time);
     if (debugPrintCreateBallisticSimulation) {
       debugPrint(
           "createBallisticSimulation: velocity ${velocity.toStringAsFixed(1)}" +
               ", offset ${position.pixels.toStringAsFixed(1)}" +
               ", range ${position.minScrollExtent.toStringAsFixed(1)}..${position.maxScrollExtent.toStringAsFixed(1)}");
     }
-    return super.createBallisticSimulation(position, velocity);
+    return super.createBallisticSimulation(position, oldSimulation, time: time);
   }
 }
 
