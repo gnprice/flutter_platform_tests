@@ -2,12 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 const EventChannel _platformVelocityEventChannel = EventChannel('scroll_overlay.flutter.io/velocity');
 
 void main() {
+  debugPrintRecognizerCallbacksTrace = true;
   runApp(DemoApp(
     // EDIT HERE if you want to experiment with a custom [ScrollPhysics].
     physics: null,
@@ -117,59 +119,82 @@ class _FlutterDemoState extends State<FlutterDemo> {
 
   @override
   Widget build(BuildContext context) {
+    MyDragGestureRecognizer();
     return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          ListView.builder(
-            controller: controller,
-            itemCount: 1000,
-            physics: getScrollPhysics(context),
-            itemBuilder: (BuildContext context, int index) {
-              return Container(
-                height: (baseItemExtent + index).toDouble(),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFF666666),
-                    width: 0.0,
-                  ),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(left: 100.0),
-                      child: Text(
-                        'Flutter $index',
-                        style: const TextStyle(fontSize: 16.0),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
+      body: RawGestureDetector(
+        gestures: {
+          MyDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<MyDragGestureRecognizer>(
+            () => MyDragGestureRecognizer(),
+            (MyDragGestureRecognizer instance) {
+              instance.onEnd = (details) { debugPrint("$details"); };
+            }
           ),
-          Align(
-            alignment: FractionalOffset.centerRight,
-            child: DefaultTextStyle.merge(
-              style: const TextStyle (fontSize: 18.0),
-              child: Padding(padding: EdgeInsets.only(right: 16),
-                child: SizedBox(
-                    width: 240,
-                    child: VelocityOverlay(
-                      flutterVelocity: flutterVelocity,
-                      platformVelocity: platformVelocity,
+        },
+        child: Stack(
+          children: <Widget>[
+            ListView.builder(
+              controller: controller,
+              itemCount: 1000,
+              physics: getScrollPhysics(context),
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  height: (baseItemExtent + index).toDouble(),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: const Color(0xFF666666),
+                      width: 0.0,
                     ),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(left: 100.0),
+                        child: Text(
+                          'Flutter $index',
+                          style: const TextStyle(fontSize: 16.0),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            Align(
+              alignment: FractionalOffset.centerRight,
+              child: DefaultTextStyle.merge(
+                style: const TextStyle (fontSize: 18.0),
+                child: Padding(padding: EdgeInsets.only(right: 16),
+                  child: SizedBox(
+                      width: 240,
+                      child: VelocityOverlay(
+                        flutterVelocity: flutterVelocity,
+                        platformVelocity: platformVelocity,
+                      ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-const bool debugPrintCreateBallisticSimulation = true;
+class MyDragGestureRecognizer extends DragGestureRecognizer {
+  MyDragGestureRecognizer({super.debugOwner, super.supportedDevices, super.allowedButtonsFilter});
+
+  @override
+  bool isFlingGesture(VelocityEstimate estimate, PointerDeviceKind kind) {
+    return true;
+  }
+
+  @override
+  String get debugDescription => 'yo';
+}
+
+const bool debugPrintCreateBallisticSimulation = false;
 
 /// A [ScrollPhysics] that just forwards to its [parent], plus debug logging.
 ///
