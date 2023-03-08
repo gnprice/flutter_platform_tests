@@ -119,82 +119,59 @@ class _FlutterDemoState extends State<FlutterDemo> {
 
   @override
   Widget build(BuildContext context) {
-    MyDragGestureRecognizer();
     return Scaffold(
-      body: RawGestureDetector(
-        gestures: {
-          MyDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<MyDragGestureRecognizer>(
-            () => MyDragGestureRecognizer(),
-            (MyDragGestureRecognizer instance) {
-              instance.onEnd = (details) { debugPrint("$details"); };
-            }
-          ),
-        },
-        child: Stack(
-          children: <Widget>[
-            ListView.builder(
-              controller: controller,
-              itemCount: 1000,
-              physics: getScrollPhysics(context),
-              itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  height: (baseItemExtent + index).toDouble(),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xFF666666),
-                      width: 0.0,
+      body: Stack(
+        children: <Widget>[
+          ListView.builder(
+            controller: controller,
+            itemCount: 1000,
+            physics: getScrollPhysics(context),
+            itemBuilder: (BuildContext context, int index) {
+              return Container(
+                height: (baseItemExtent + index).toDouble(),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color(0xFF666666),
+                    width: 0.0,
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(left: 100.0),
+                      child: Text(
+                        'Flutter $index',
+                        style: const TextStyle(fontSize: 16.0),
+                      ),
                     ),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(left: 100.0),
-                        child: Text(
-                          'Flutter $index',
-                          style: const TextStyle(fontSize: 16.0),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-            Align(
-              alignment: FractionalOffset.centerRight,
-              child: DefaultTextStyle.merge(
-                style: const TextStyle (fontSize: 18.0),
-                child: Padding(padding: EdgeInsets.only(right: 16),
-                  child: SizedBox(
-                      width: 240,
-                      child: VelocityOverlay(
-                        flutterVelocity: flutterVelocity,
-                        platformVelocity: platformVelocity,
-                      ),
-                  ),
+                  ],
+                ),
+              );
+            },
+          ),
+          Align(
+            alignment: FractionalOffset.centerRight,
+            child: DefaultTextStyle.merge(
+              style: const TextStyle (fontSize: 18.0),
+              child: Padding(padding: EdgeInsets.only(right: 16),
+                child: SizedBox(
+                    width: 240,
+                    child: VelocityOverlay(
+                      flutterVelocity: flutterVelocity,
+                      platformVelocity: platformVelocity,
+                    ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class MyDragGestureRecognizer extends DragGestureRecognizer {
-  MyDragGestureRecognizer({super.debugOwner, super.supportedDevices, super.allowedButtonsFilter});
-
-  @override
-  bool isFlingGesture(VelocityEstimate estimate, PointerDeviceKind kind) {
-    return true;
-  }
-
-  @override
-  String get debugDescription => 'yo';
-}
-
-const bool debugPrintCreateBallisticSimulation = false;
+const bool debugPrintCreateBallisticSimulation = true;
 
 /// A [ScrollPhysics] that just forwards to its [parent], plus debug logging.
 ///
